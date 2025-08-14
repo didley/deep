@@ -1,37 +1,38 @@
 {
-  "name": "deep",
-  "version": "0.0.1",
-  "packageManager": "pnpm@10.14.0",
-  "private": true,
-  "scripts": {
-    "lint": "eslint .",
-    "start": "react-native start",
-    "start:macos": "react-native run-macos"
-  },
-  "dependencies": {
-    "react": "19.0.0",
-    "react-native": "0.78.3",
-    "react-native-macos": "^0.78.6"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/preset-env": "^7.25.3",
-    "@babel/runtime": "^7.25.0",
-    "@react-native-community/cli": "15.0.1",
-    "@react-native-community/cli-platform-android": "15.0.1",
-    "@react-native-community/cli-platform-ios": "15.0.1",
-    "@react-native/babel-preset": "0.78.3",
-    "@react-native/eslint-config": "0.78.3",
-    "@react-native/metro-config": "0.78.3",
-    "@react-native/typescript-config": "0.78.3",
-    "@types/react": "^19.0.0",
-    "@types/react-test-renderer": "^19.0.0",
-    "eslint": "^8.19.0",
-    "prettier": "2.8.8",
-    "react-test-renderer": "19.0.0",
-    "typescript": "5.0.4"
-  },
-  "engines": {
-    "node": ">=18"
-  }
+	"name": "deep",
+	"version": "0.0.1",
+	"packageManager": "pnpm@10.14.0",
+	"private": true,
+	"scripts": {
+		"start": "pnpm start:metro & pnpm start:macos",
+		"start:metro": "react-native start",
+		"start:macos": "react-native run-macos",
+		"check": "pnpm compile && pnpm lint && pnpm format",
+		"compile": "tsc",
+		"lint": "exec biome lint --write",
+		"format": "exec biome format --write"
+	},
+	"dependencies": {
+		"react": "19.0.0",
+		"react-native": "0.78.3",
+		"react-native-macos": "^0.78.6"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.25.2",
+		"@babel/preset-env": "^7.25.3",
+		"@babel/runtime": "^7.25.0",
+		"@biomejs/biome": "2.2.0",
+		"@react-native-community/cli": "15.0.1",
+		"@react-native-community/cli-platform-android": "15.0.1",
+		"@react-native-community/cli-platform-ios": "15.0.1",
+		"@react-native/babel-preset": "0.78.3",
+		"@react-native/metro-config": "0.78.3",
+		"@react-native/typescript-config": "0.78.3",
+		"@types/jest": "^30.0.0",
+		"@types/react": "^19.0.0",
+		"typescript": "5.0.4"
+	},
+	"engines": {
+		"node": ">=18"
+	}
 }
