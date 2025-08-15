@@ -4,8 +4,9 @@
 	"packageManager": "pnpm@10.14.0",
 	"private": true,
 	"scripts": {
-		"start": "pnpm start:metro & pnpm start:macos",
-		"start:metro": "react-native start",
+		"preinstall": "cd macos && pod install && cd ..",
+		"dev": "pnpm start & pnpm start:macos",
+		"start": "react-native start",
 		"start:macos": "react-native run-macos",
 		"check": "pnpm compile && pnpm lint && pnpm format",
 		"compile": "tsc",
