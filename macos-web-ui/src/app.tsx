@@ -1,6 +1,4 @@
 import { useState } from "preact/hooks";
-import preactLogo from "./assets/preact.svg";
-import viteLogo from "/vite.svg";
 import "./app.css";
 
 export function App() {
@@ -8,37 +6,41 @@ export function App() {
 
 	return (
 		<>
+			<button type="button" onClick={() => setCount((count) => count + 1)}>
+				count is {count}
+			</button>
 
-				<button type="button" onClick={() => setCount((count) => count + 1)}>
-					count is {count}
-				</button>
+			<button
+				type="button"
+				onClick={() => WebKit().postMessage({ type: "startCapture" })}
+			>
+				Start capture
+			</button>
 
-<button type="button" onClick={() => WebKit().postMessage({type: 'startCapture'})}>
-  Start capture
-</button>
-
-<button type="button" onClick={() => WebKit().postMessage({type: 'stopCapture'})}>
-  Stop capture
-</button>
-
-
+			<button
+				type="button"
+				onClick={() => WebKit().postMessage({ type: "stopCapture" })}
+			>
+				Stop capture
+			</button>
 		</>
 	);
 }
 
-
-type WebKitAction = {type: "startCapture"} | {type: "stopCapture"}
+type WebKitAction = { type: "startCapture" } | { type: "stopCapture" };
 
 type NativeObject = {
- postMessage:(action: WebKitAction) => void
-}
+	postMessage: (action: WebKitAction) => void;
+};
 
 const WebKit = () => {
-  const nativeObj = (window as any)?.webkit?.messageHandlers?.native as NativeObject | undefined
+	const nativeObj = (window as any)?.webkit?.messageHandlers?.native as
+		| NativeObject
+		| undefined;
 
-  if(!nativeObj) {
-    throw new Error("Native object not found")
-  }
+	if (!nativeObj) {
+		throw new Error("Native object not found");
+	}
 
-  return nativeObj
-}
+	return nativeObj;
+};
