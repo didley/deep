@@ -1,0 +1,54 @@
+# Build products
+build/
+DerivedData/
+
+# Xcode specific
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# User-specific settings
+xcuserdata/
+*.moved-aside
+*.swp
+*.lock
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+Package.resolved
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# Accio dependency manager
+Dependencies/
+.accio/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# iOS device support
+.DS_Store
+
+# Archives
+*.xcarchive
+
+# Debugging
+*.log
+
+# Temporary files
+*.tmp
+*.temp

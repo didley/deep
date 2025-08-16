@@ -25,10 +25,10 @@ final class MinimalScreenCapture: NSObject, SCStreamOutput {
         cfg.height = 1
         cfg.showsCursor = false
         cfg.capturesAudio = false
-        cfg.minimumFrameInterval = CMTime(value: 1, timescale: 2) // ~2 fps
-        cfg.sourceRect = CGRect(x: 0, y: 0, width: 1, height: 1) 
+        cfg.minimumFrameInterval = CMTime(value: 60, timescale: 1) // ~2 fps
+        cfg.sourceRect = CGRect(x: 0, y: 0, width: 1, height: 1)
         self.config = cfg
-
+        
         let stream = SCStream(filter: filter, configuration: cfg, delegate: nil)
         self.stream = stream
 
