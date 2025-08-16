@@ -27,7 +27,7 @@ export function App() {
 }
 
 
-type WebKitAction = {type: "startCapture"}
+type WebKitAction = {type: "startCapture"} | {type: "stopCapture"}
 
 type NativeObject = {
  postMessage:(action: WebKitAction) => void

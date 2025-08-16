@@ -7,7 +7,7 @@ let webClientUrl = URL(string: WEB_CLIENT_URL)!
 
 final class WebViewController: NSViewController, WKScriptMessageHandler, WKNavigationDelegate {
     private var webView: WKWebView!
-    private var capture: MinimalScreenCapture?   // keep a single instance
+    private var capture: MinimalScreenCapture? 
 
     override func loadView() {
         let contentController = WKUserContentController()
