@@ -13,7 +13,7 @@ final class MinimalScreenCapture: NSObject, SCStreamOutput {
         // Get a display
         let shareable = try await SCShareableContent.current
         guard let display = shareable.displays.first else {
-            throw NSError(domain: "MinimalCapture", code: 1, userInfo: [NSLocalizedDescriptionKey: "No display"])
+            throw NSError(domain: "MinimalScreenCapture", code: 1, userInfo: [NSLocalizedDescriptionKey: "No display"])
         }
 
         // Keep filter/config alive
