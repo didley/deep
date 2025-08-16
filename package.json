@@ -40,5 +40,10 @@
 		"name": "NativeScreenCaptureSpec",
 		"type": "modules",
 		"jsSrcsDir": "specs"
+	},
+	"ios": {
+		"modulesProvider": {
+			"NativeScreenCapture": "RCTNativeScreenCapture"
+		}
 	}
 }

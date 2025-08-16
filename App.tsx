@@ -1,10 +1,18 @@
 import { View } from "react-native";
-import { Text } from "react-native-macos";
+import { Button, Text } from "react-native-macos";
+import NativeScreenCapture from "./specs/NativeScreenCapture";
 
 const App = () => {
+	const startCapture = () => NativeScreenCapture.startCapture();
+
+	const endCapture = () => NativeScreenCapture.endCapture();
+
 	return (
 		<View>
-			<Text>Hello world</Text>
+			<Text>Press:</Text>
+			<Button title="Start" onPress={startCapture} />
+
+			<Button title="End" onPress={endCapture} />
 		</View>
 	);
 };
