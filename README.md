@@ -3,8 +3,9 @@
 ## Install
 ```
 npm i
+cd macos
 bundle install
-pod install
+bundle exec pod install
 ```
 
 ## Start

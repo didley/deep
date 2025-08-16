@@ -5,7 +5,7 @@
 	"private": true,
 	"scripts": {
 		"preinstall": "cd macos && pod install && cd ..",
-		"dev": "pnpm start & pnpm start:macos",
+		"dev": "pnpm start:macos && pnpm start",
 		"start": "react-native start",
 		"start:macos": "react-native run-macos",
 		"check": "pnpm compile && pnpm lint && pnpm format",
@@ -35,5 +35,10 @@
 	},
 	"engines": {
 		"node": ">=18"
+	},
+	"codegenConfig": {
+		"name": "NativeScreenCaptureSpec",
+		"type": "modules",
+		"jsSrcsDir": "specs"
 	}
 }
