@@ -1,5 +1,4 @@
 import ScreenCaptureKit
-import AVFoundation
 
 final class MinimalScreenCapture: NSObject, SCStreamOutput {
     // Strong refs
@@ -10,30 +9,32 @@ final class MinimalScreenCapture: NSObject, SCStreamOutput {
 
     @MainActor
     func start() async throws {
-        // Get a display
+        // Pick first display
         let shareable = try await SCShareableContent.current
         guard let display = shareable.displays.first else {
             throw NSError(domain: "MinimalScreenCapture", code: 1, userInfo: [NSLocalizedDescriptionKey: "No display"])
         }
 
-        // Keep filter/config alive
+        // Filter & config (tiny region, ultra-low fps)
         let filter = SCContentFilter(display: display, excludingApplications: [], exceptingWindows: [])
         self.filter = filter
 
         let cfg = SCStreamConfiguration()
-        cfg.width = 1
-        cfg.height = 1
+        cfg.width = 2
+        cfg.height = 2
+        cfg.sourceRect = CGRect(x: 0, y: 0, width: 1, height: 1) // 1×1 crop
         cfg.showsCursor = false
         cfg.capturesAudio = false
-        cfg.minimumFrameInterval = CMTime(value: 60, timescale: 1) // ~2 fps
-        cfg.sourceRect = CGRect(x: 0, y: 0, width: 1, height: 1)
+        cfg.queueDepth = 1
+        cfg.minimumFrameInterval = CMTime(seconds: 3600, preferredTimescale: 600) // 1 frame/hour
         self.config = cfg
-        
+
         let stream = SCStream(filter: filter, configuration: cfg, delegate: nil)
         self.stream = stream
 
         try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: queue)
-        try await stream.startCapture() // triggers “presenting” state
+        try await stream.startCapture() // triggers "Presenting" state
+        fputs("Started minimal capture (Presenting).", stderr)
     }
 
     func stop() {
@@ -44,10 +45,13 @@ final class MinimalScreenCapture: NSObject, SCStreamOutput {
             self.stream = nil
             self.filter = nil
             self.config = nil
+            fputs("Stopped minimal capture (Presenting).\n", stderr)
         }
     }
-
-    // Drop frames
-    func stream(_ stream: SCStream, didOutputSampleBuffer sbuf: CMSampleBuffer, of type: SCStreamOutputType) { }
-    func stream(_ stream: SCStream, didStopWithError error: Error) { print("SCStream stopped:", error) }
+    
+    // Drop all frames
+    func stream(_ stream: SCStream, didOutputSampleBuffer sbuf: CMSampleBuffer, of type: SCStreamOutputType) { /* no-op */ }
+    func stream(_ stream: SCStream, didStopWithError error: Error) {
+        fputs("SCStream stopped with error: \(error)\n", stderr)
+    }
 }
