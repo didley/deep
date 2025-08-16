@@ -1,11 +1,13 @@
 import SwiftUI
 import WebKit
+import ScreenCaptureKit
 
 let WEB_CLIENT_URL = "http://localhost:5173/"
 let webClientUrl = URL(string: WEB_CLIENT_URL)!
 
 final class WebViewController: NSViewController, WKScriptMessageHandler, WKNavigationDelegate {
     private var webView: WKWebView!
+    private var capture: MinimalScreenCapture?   // keep a single instance
 
     override func loadView() {
         let contentController = WKUserContentController()
@@ -27,20 +29,29 @@ final class WebViewController: NSViewController, WKScriptMessageHandler, WKNavig
         webView.load(URLRequest(url: url))
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceive message: WKScriptMessage) {
         guard message.name == "native" else { return }
 
-        guard let action = message.body as? [String: Any],
-              let type = action["type"] as? String else {
+        guard
+            let action = message.body as? [String: Any],
+            let type = action["type"] as? String
+        else {
             print("Invalid message shape:", message.body)
             return
         }
 
         switch type {
         case "startCapture":
-            print("start capture with payload:", action["payload"] ?? "none")
+            if capture == nil { capture = MinimalScreenCapture() }
+            Task { @MainActor in
+                do { try await capture?.start() } catch { print("start error:", error) }
+            }
+
         case "stopCapture":
-            print("stop capture")
+            capture?.stop()
+            capture = nil
+
         default:
             print("Unknown action:", type)
         }
@@ -49,26 +60,13 @@ final class WebViewController: NSViewController, WKScriptMessageHandler, WKNavig
 
 struct WebViewControllerRepresentable: NSViewControllerRepresentable {
     let url: URL
-
-    func makeNSViewController(context: Context) -> WebViewController {
-        let vc = WebViewController()
-        return vc
-    }
-
-    func updateNSViewController(_ nsViewController: WebViewController, context: Context) {
-        nsViewController.load(url)
-    }
+    func makeNSViewController(context: Context) -> WebViewController { WebViewController() }
+    func updateNSViewController(_ vc: WebViewController, context: Context) { vc.load(url) }
 }
 
 @main
 struct deepApp: App {
     var body: some Scene {
-        WindowGroup {
-            WebViewControllerRepresentable(url: webClientUrl)
-        }
+        WindowGroup { WebViewControllerRepresentable(url: webClientUrl) }
     }
-}
-
-#Preview {
-    WebViewControllerRepresentable(url: webClientUrl)
 }

@@ -17,6 +17,11 @@ export function App() {
   Start capture
 </button>
 
+<button type="button" onClick={() => WebKit().postMessage({type: 'stopCapture'})}>
+  Stop capture
+</button>
+
+
 		</>
 	);
 }
