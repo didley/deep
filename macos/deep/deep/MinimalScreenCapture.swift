@@ -6,7 +6,11 @@ final class MinimalScreenCapture: NSObject, SCStreamOutput {
     private var filter: SCContentFilter?
     private var config: SCStreamConfiguration?
     private let queue = DispatchQueue(label: "capture.drop.queue")
-
+    
+    static func hasPermission() -> Bool {
+        CGPreflightScreenCaptureAccess()
+    }
+    
     @MainActor
     func start() async throws {
         // Pick first display
