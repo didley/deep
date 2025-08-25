@@ -26,7 +26,13 @@
 		"noUnusedParameters": true,
 		"erasableSyntaxOnly": true,
 		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true
+		"noUncheckedSideEffectImports": true,
+
+		/* Not supplied by Vite */
+		"noUncheckedIndexedAccess": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"exactOptionalPropertyTypes": true
 	},
 	"include": ["src"]
 }
