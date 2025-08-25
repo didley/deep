@@ -49,6 +49,18 @@ export function App() {
 			>
 				hasPermission
 			</button>
+
+			<button
+				type="button"
+				onClick={() =>
+					WebKit()
+						.postMessage({ method: "capture.isActive" })
+						.then((a) => setMsg(JSON.stringify({ m: "active", a })))
+						.catch((e) => setMsg(JSON.stringify({ m: "active error", e })))
+				}
+			>
+				active
+			</button>
 		</>
 	);
 }
@@ -56,6 +68,7 @@ export function App() {
 type WebToNativeRequestFn = {
 	(args: { method: "capture.start" | "capture.stop" }): Promise<{ ok: true }>;
 	(args: { method: "capture.hasPermission" }): Promise<{ allowed: boolean }>;
+	(args: { method: "capture.isActive" }): Promise<{ active: boolean }>;
 };
 
 type NativeObject = {

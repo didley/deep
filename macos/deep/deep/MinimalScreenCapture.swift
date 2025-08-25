@@ -11,6 +11,10 @@ final class MinimalScreenCapture: NSObject, SCStreamOutput {
         CGPreflightScreenCaptureAccess()
     }
     
+    func isActive() -> Bool {
+        stream != nil
+    }
+    
     @MainActor
     func start() async throws {
         // Pick first display

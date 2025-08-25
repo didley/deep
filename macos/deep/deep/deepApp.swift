@@ -62,6 +62,10 @@ final class WebViewController: NSViewController, WKNavigationDelegate {
             let allowed = MinimalScreenCapture.hasPermission()
             return ["allowed": allowed]
 
+        case "capture.isActive":
+            let active = capture?.isActive() ?? false
+            return ["active": active]
+
         default:
             throw NSError(domain: "native.bridge", code: 404, userInfo: [NSLocalizedDescriptionKey: "Unknown method: \(method)"])
         }
