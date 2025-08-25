@@ -8,7 +8,7 @@ let webClientUrl = URL(string: WEB_CLIENT_URL)!
 @main
 struct deepApp: App {
     var body: some Scene {
-        WindowGroup { WebViewControllerRepresentable(url: webClientUrl) }
+        WindowGroup { WebViewControllerRepresentable(url: webClientUrl) }.windowStyle(.hiddenTitleBar).defaultSize(width: 1000, height: 600)
     }
 }
 
