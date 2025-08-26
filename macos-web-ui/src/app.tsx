@@ -1,88 +1,144 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import "./app.css";
+import { WebKit, type WebKitObject } from "./services/webKit";
+import { useOnFocus } from "./utils/hooks/useOnFocus";
 
-export function App() {
-	const [count, setCount] = useState(0);
-	const [msg, setMsg] = useState("");
+type SessionStatus =
+	| { kind: "idle" }
+	| { kind: "loading" }
+	| { kind: "success"; active: boolean }
+	| { kind: "error"; msg: string };
+
+const INACTIVE_TEXT = "Go deep";
+const STOP_TEXT = "Cancel session";
+
+type ScreenPermsStatus =
+	| { kind: "idle" }
+	| { kind: "loading" }
+	| { kind: "success"; allowed: boolean }
+	| { kind: "error"; msg: string };
+
+const refreshSessionStatus = async ({
+	setSessionStatus,
+	wk,
+}: {
+	setSessionStatus: (args: SessionStatus) => void;
+	wk: WebKitObject;
+}) => {
+	try {
+		const { active } = await wk.postMessage({
+			method: "capture.isActive",
+		});
+
+		setSessionStatus({ kind: "success", active });
+	} catch (e) {
+		console.error(e);
+		setSessionStatus({
+			kind: "error",
+			msg: "Failed to fetch session status.",
+		});
+	}
+};
+
+export const App = () => {
+	const [sessionStatus, setSessionStatus] = useState<SessionStatus>({
+		kind: "idle",
+	});
+
+	const [hasScreenPerms, setHasScreenPerms] = useState<ScreenPermsStatus>({
+		kind: "idle",
+	});
+
+	const isActiveSession =
+		sessionStatus.kind === "success" && sessionStatus.active;
+
+	const isLoading =
+		sessionStatus.kind === "loading" || hasScreenPerms.kind === "loading";
+
+	const wk = WebKit();
+
+	useEffect(() => {
+		const initSessionStats = async () => {
+			setSessionStatus({ kind: "loading" });
+			refreshSessionStatus({ setSessionStatus, wk });
+		};
+
+		initSessionStats();
+	}, []);
+
+	useEffect(() => {
+		const initFetchScreenPermsStatus = async () => {
+			setHasScreenPerms({ kind: "loading" });
+
+			try {
+				const { allowed } = await wk.postMessage({
+					method: "capture.hasPermission",
+				});
+
+				setHasScreenPerms({ kind: "success", allowed });
+			} catch (e) {
+				console.error(e);
+				setHasScreenPerms({
+					kind: "error",
+					msg: "Failed to load screen permissions.",
+				});
+			}
+		};
+
+		initFetchScreenPermsStatus();
+	}, []);
+
+	useOnFocus(() => refreshSessionStatus({ setSessionStatus, wk }));
+
+	const handleStartSession = async () => {
+		setSessionStatus({ kind: "loading" });
+		try {
+			await wk.postMessage({ method: "capture.start" });
+			setSessionStatus({ kind: "success", active: true });
+		} catch (e) {
+			console.error(e);
+			setSessionStatus({ kind: "error", msg: "Failed to start session." });
+		}
+	};
+
+	const handleEndSession = async () => {
+		setSessionStatus({ kind: "loading" });
+		try {
+			await wk.postMessage({ method: "capture.stop" });
+			setSessionStatus({ kind: "success", active: false });
+		} catch (e) {
+			console.error(e);
+			setSessionStatus({ kind: "error", msg: "Failed to start session." });
+		}
+	};
+
+	const noScreenPerms =
+		!isLoading && hasScreenPerms.kind === "success" && !hasScreenPerms.allowed;
+
+	const sessionButtonDisabled = isLoading || noScreenPerms;
 
 	return (
-		<>
-			{msg}
-			<button type="button" onClick={() => setCount((count) => count + 1)}>
-				count is {count}
-			</button>
-
+		<div>
+			<p>Deep status: {JSON.stringify({ sessionStatus, hasScreenPerms })}</p>
 			<button
 				type="button"
-				onClick={() =>
-					WebKit()
-						.postMessage({ method: "capture.start" })
-						.then((a) => setMsg(JSON.stringify({ m: "started", a })))
-						.catch((e) => setMsg(JSON.stringify({ m: "start error", e })))
-				}
+				onClick={isActiveSession ? handleEndSession : handleStartSession}
+				disabled={sessionButtonDisabled}
 			>
-				Start capture
+				{isActiveSession ? STOP_TEXT : INACTIVE_TEXT}
 			</button>
 
-			<button
-				type="button"
-				onClick={() =>
-					WebKit()
-						.postMessage({ method: "capture.stop" })
-						.then((a) => setMsg(JSON.stringify({ m: "stopped", a })))
-						.catch((e) => setMsg(JSON.stringify({ m: "stop error", e })))
-				}
-			>
-				Stop capture
-			</button>
-
-			<button
-				type="button"
-				onClick={() =>
-					WebKit()
-						.postMessage({ method: "capture.hasPermission" })
-						.then((a) => setMsg(JSON.stringify({ m: "hasPermission", a })))
-						.catch((e) =>
-							setMsg(JSON.stringify({ m: "hasPermission error", e })),
-						)
-				}
-			>
-				hasPermission
-			</button>
-
-			<button
-				type="button"
-				onClick={() =>
-					WebKit()
-						.postMessage({ method: "capture.isActive" })
-						.then((a) => setMsg(JSON.stringify({ m: "active", a })))
-						.catch((e) => setMsg(JSON.stringify({ m: "active error", e })))
-				}
-			>
-				active
-			</button>
-		</>
+			{noScreenPerms && (
+				<div>
+					<p>⚠️ You don't have screen permissions enabled.</p>
+					<button
+						type="button"
+						onClick={() => wk.postMessage({ method: "capture.start" })}
+					>
+						Request access
+					</button>
+				</div>
+			)}
+		</div>
 	);
-}
-
-type WebToNativeRequestFn = {
-	(args: { method: "capture.start" | "capture.stop" }): Promise<{ ok: true }>;
-	(args: { method: "capture.hasPermission" }): Promise<{ allowed: boolean }>;
-	(args: { method: "capture.isActive" }): Promise<{ active: boolean }>;
-};
-
-type NativeObject = {
-	postMessage: WebToNativeRequestFn;
-};
-
-const WebKit = () => {
-	const nativeObj = (window as any)?.webkit?.messageHandlers?.native as
-		| NativeObject
-		| undefined;
-
-	if (!nativeObj) {
-		throw new Error("Native object not found");
-	}
-
-	return nativeObj;
 };
