@@ -1,0 +1,19 @@
+{
+	"name": "integration-architecture",
+	"packageManager": "pnpm@10.14.0",
+	"private": true,
+	"scripts": {
+		"dev": "pnpm -r --parallel dev",
+		"preview": "pnpm -r preview",
+		"check": "pnpm -r check",
+		"build": "pnpm -r build",
+		"lint": "pnpm -r lint",
+		"format": "pnpm -r format"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.0"
+	},
+	"engines": {
+		"node": "22"
+	}
+}
