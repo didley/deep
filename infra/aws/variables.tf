@@ -7,4 +7,3 @@ variable "region" {
   type        = string
   description = "Base AWS region"
 }
-

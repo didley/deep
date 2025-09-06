@@ -20,3 +20,6 @@ override.tf.json
 
 # Terraform plan output
 *.plan
+
+# Build output
+dist/
