@@ -10,4 +10,4 @@ open http://localhost:3000
 
 ## Deployment
 
-cd /infra/aws && make apply
+make deploy

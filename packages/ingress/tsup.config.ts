@@ -9,4 +9,5 @@ export default defineConfig({
 	noExternal: [/.*/],
 	format: ["esm"],
 	outExtension: () => ({ js: ".mjs" }),
+	outDir: "dist/js"
 });
