@@ -1,22 +1,16 @@
-APP      ?= ingress_package
-BUCKET   ?= ingress-package-lambda
 REGION   ?= ap-southeast-2
-FUNCTION_NAME ?= IngressPackage
 
+APP := ingress_lambda
 ZIP_DIST := dist/zip
-ZIP      := $(APP).zip
 
-deploy: publish-s3
+deploy: publish-lambda
 build:
 	pnpm build
 zip: build
-	rm -rf $(ZIP_DIST) && mkdir -p $(ZIP_DIST) && cd dist/js && zip -r ../zip/$(ZIP) . && cd ../..
-s3: zip
-	aws s3 cp $(ZIP_DIST)/$(ZIP) s3://$(BUCKET)/$(ZIP) --region $(REGION)
-publish-s3: s3
+	rm -rf $(ZIP_DIST) && mkdir -p $(ZIP_DIST) && cd dist/js && zip -r ../zip/$(APP).zip . && cd ../..
+publish-lambda: zip
 	aws lambda update-function-code \
-	  --function-name $(FUNCTION_NAME) \
-	  --s3-bucket $(BUCKET) \
-	  --s3-key $(ZIP) \
+	  --function-name $(APP) \
+	  --zip-file fileb://dist/zip/$(APP).zip \
 	  --region $(REGION) \
 	  --no-cli-pager 
